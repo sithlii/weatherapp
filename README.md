@@ -35,8 +35,8 @@ npm run dev
 
 ```
 ├── config/              # TypeScript configuration files
-│   ├── tsconfig.json    # TypeScript config
-│   └── tsconfig.node.json # TypeScript node config
+│   └── tsconfig.json    # TypeScript config
+├── tsconfig.node.json   # TypeScript node config (Vite)
 ├── vite.config.ts       # Vite configuration
 ├── tailwind.config.js   # Tailwind CSS config
 ├── postcss.config.js    # PostCSS config
