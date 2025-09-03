@@ -8,7 +8,10 @@
     "build": "tsc --project config/tsconfig.json && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "install:setup": "scripts/install.sh"
+    "install:setup": "scripts/install.sh",
+    "setup:windows": "scripts\\run-windows.bat",
+    "setup:windows-ps": "powershell -ExecutionPolicy Bypass -File scripts\\run-windows.ps1",
+    "build:windows": "scripts\\build-windows.bat"
   },
   "dependencies": {
     "axios": "^1.6.0",

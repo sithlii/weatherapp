@@ -4,6 +4,7 @@ A sleek, modern weather application built with React, TypeScript, and Tailwind C
 
 ## 🚀 Quick Start
 
+### Linux/macOS:
 ```bash
 # Install dependencies
 npm install
@@ -15,6 +16,20 @@ cp env.example .env
 # Start development server
 npm run dev
 ```
+
+### Windows:
+```cmd
+# Option 1: Use the automated script
+scripts\run-windows.bat
+
+# Option 2: Manual setup
+npm install
+copy env.example .env
+# Edit .env and add your OpenWeatherMap API key
+npm run dev
+```
+
+**📖 For detailed Windows setup instructions, see [docs/WINDOWS_SETUP.md](docs/WINDOWS_SETUP.md)**
 
 ## 📁 Project Structure
 
