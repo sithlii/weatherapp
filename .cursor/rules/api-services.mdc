@@ -1,0 +1,29 @@
+---
+globs: src/services/*.ts,src/hooks/*.ts
+description: API integration and data fetching patterns
+---
+
+# API Services and Data Fetching
+
+## Weather API Integration
+- Main API service: [src/services/weatherApi.ts](mdc:src/services/weatherApi.ts)
+- Use proper TypeScript types from [src/types/weather.ts](mdc:src/types/weather.ts)
+- Implement proper error handling for API failures
+- Handle rate limiting and API key management
+
+## Data Fetching Patterns
+- Use React hooks for data fetching (useEffect, useState)
+- Implement loading states and error handling
+- Cache API responses when appropriate
+- Use the custom hooks in [src/hooks/](mdc:src/hooks/) for reusable logic
+
+## Environment Configuration
+- API keys should be stored in environment variables
+- Use [env.example](mdc:env.example) as a template for required environment variables
+- Never commit API keys to version control
+
+## Error Handling
+- Implement proper error boundaries
+- Use [src/components/ErrorMessage.tsx](mdc:src/components/ErrorMessage.tsx) for user-facing errors
+- Log errors appropriately for debugging
+- Provide fallback UI states for failed API calls

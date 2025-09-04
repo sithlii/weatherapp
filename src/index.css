@@ -18,9 +18,7 @@
     @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-xl;
   }
   
-  .weather-card {
-    @apply glass-effect rounded-2xl p-6 transition-all duration-300 hover:shadow-2xl hover:scale-105;
-  }
+  /* .weather-card class removed - now using AnimatedCard component with Framer Motion */
   
   .gradient-text {
     @apply bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent;
@@ -52,10 +50,7 @@
   @apply from-blue-500 to-purple-600;
 }
 
-/* Loading animation */
-.loading-spinner {
-  @apply animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500;
-}
+/* Loading animation - now handled by AnimatedSpinner component */
 
 /* Weather icon animations */
 .weather-icon {

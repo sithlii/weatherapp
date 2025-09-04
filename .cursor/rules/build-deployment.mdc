@@ -1,0 +1,29 @@
+---
+globs: scripts/*,*.json,*.config.*
+description: Build, deployment, and project configuration guidelines
+---
+
+# Build and Deployment
+
+## Build Configuration
+- Vite configuration: [vite.config.ts](mdc:vite.config.ts)
+- TypeScript configuration: [config/tsconfig.json](mdc:config/tsconfig.json)
+- Tailwind configuration: [tailwind.config.js](mdc:tailwind.config.js)
+- PostCSS configuration: [postcss.config.js](mdc:postcss.config.js)
+
+## Scripts and Automation
+- Build scripts: [scripts/build-windows.bat](mdc:scripts/build-windows.bat)
+- Installation: [scripts/install.sh](mdc:scripts/install.sh)
+- Windows runners: [scripts/run-windows.bat](mdc:scripts/run-windows.bat), [scripts/run-windows.ps1](mdc:scripts/run-windows.ps1)
+
+## Package Management
+- Dependencies: [package.json](mdc:package.json)
+- Lock file: [package-lock.json](mdc:package-lock.json)
+- Use npm for package management
+- Keep dependencies up to date and secure
+
+## Documentation
+- Main documentation: [README.md](mdc:README.md)
+- Windows setup: [docs/WINDOWS_SETUP.md](mdc:docs/WINDOWS_SETUP.md)
+- Keep documentation current with code changes
+- Include setup instructions and troubleshooting guides

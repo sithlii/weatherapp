@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ForecastDay } from '../types/weather';
+import { 
+  getTemperatureColor, 
+  getConditionGradient, 
+  formatDate 
+} from '../utils/weatherUtils';
 import { 
   ChevronDown, 
   ChevronUp, 
@@ -20,45 +26,54 @@ export const Forecast: React.FC<ForecastProps> = ({ forecast }) => {
     setExpandedDay(expandedDay === index ? null : index);
   };
 
-  const getDayGradient = (condition: string) => {
-    switch (condition) {
-      case 'clear':
-        return 'from-yellow-400/20 to-orange-500/20';
-      case 'clouds':
-        return 'from-gray-400/20 to-gray-600/20';
-      case 'rain':
-        return 'from-blue-400/20 to-blue-600/20';
-      case 'snow':
-        return 'from-blue-200/20 to-blue-400/20';
-      case 'thunderstorm':
-        return 'from-purple-500/20 to-indigo-600/20';
-      default:
-        return 'from-gray-400/20 to-gray-600/20';
-    }
-  };
 
-  const getTemperatureColor = (temp: number) => {
-    if (temp < 0) return 'text-blue-400';
-    if (temp < 10) return 'text-blue-500';
-    if (temp < 20) return 'text-green-500';
-    if (temp < 30) return 'text-yellow-500';
-    return 'text-red-500';
-  };
 
   return (
-    <div className="weather-card">
-      <h3 className="text-2xl font-bold text-gray-900 mb-6">5-Day Forecast</h3>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className="weather-card"
+    >
+      <motion.h3
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.3 }}
+        className="text-2xl font-bold text-gray-900 mb-6"
+      >
+        5-Day Forecast
+      </motion.h3>
       
-      <div className="space-y-4">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={{
+          hidden: { opacity: 0 },
+          visible: {
+            opacity: 1,
+            transition: {
+              staggerChildren: 0.1
+            }
+          }
+        }}
+        className="space-y-4"
+      >
         {forecast.map((day, index) => (
-          <div
+          <motion.div
             key={day.date}
+            variants={{
+              hidden: { opacity: 0, y: 20 },
+              visible: { opacity: 1, y: 0 }
+            }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
             className={`glass-effect rounded-xl transition-all duration-300 ${
               expandedDay === index ? 'shadow-lg' : 'hover:shadow-md'
             }`}
           >
             {/* Day Header */}
-            <button
+            <motion.button
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
               onClick={() => toggleExpanded(index)}
               className="w-full p-4 flex items-center justify-between hover:bg-white/30 transition-colors rounded-xl"
             >
@@ -68,10 +83,7 @@ export const Forecast: React.FC<ForecastProps> = ({ forecast }) => {
                     {day.dayName}
                   </div>
                   <div className="text-xs text-gray-500">
-                    {new Date(day.date).toLocaleDateString('en-US', { 
-                      month: 'short', 
-                      day: 'numeric' 
-                    })}
+                    {formatDate(day.date)}
                   </div>
                 </div>
                 
@@ -120,19 +132,49 @@ export const Forecast: React.FC<ForecastProps> = ({ forecast }) => {
                   <ChevronDown className="w-5 h-5 text-gray-400" />
                 )}
               </div>
-            </button>
+            </motion.button>
 
             {/* Expanded Hourly Forecast */}
-            {expandedDay === index && (
-              <div className="px-4 pb-4 animate-slide-up">
-                <div className={`h-px bg-gradient-to-r ${getDayGradient(day.condition)} mb-4`}></div>
+            <AnimatePresence>
+              {expandedDay === index && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  className="px-4 pb-4 overflow-hidden"
+                >
+                  <motion.div
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ delay: 0.1, duration: 0.3 }}
+                    className={`h-px bg-gradient-to-r ${getConditionGradient(day.condition, 0.2)} mb-4 origin-left`}
+                  ></motion.div>
                 
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                  {day.hourly.slice(0, 12).map((hour, hourIndex) => (
-                    <div
-                      key={hourIndex}
-                      className="glass-effect rounded-lg p-3 text-center hover:bg-white/50 transition-colors"
-                    >
+                  <motion.div
+                    initial="hidden"
+                    animate="visible"
+                    variants={{
+                      hidden: { opacity: 0 },
+                      visible: {
+                        opacity: 1,
+                        transition: {
+                          staggerChildren: 0.05
+                        }
+                      }
+                    }}
+                    className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3"
+                  >
+                    {day.hourly.slice(0, 12).map((hour, hourIndex) => (
+                      <motion.div
+                        key={hourIndex}
+                        variants={{
+                          hidden: { opacity: 0, scale: 0.8 },
+                          visible: { opacity: 1, scale: 1 }
+                        }}
+                        whileHover={{ scale: 1.05 }}
+                        className="glass-effect rounded-lg p-3 text-center hover:bg-white/50 transition-colors"
+                      >
                       <div className="text-sm font-medium text-gray-600 mb-2">
                         {hour.time}
                       </div>
@@ -151,14 +193,15 @@ export const Forecast: React.FC<ForecastProps> = ({ forecast }) => {
                         <Droplets className="w-3 h-3" />
                         <span>{hour.humidity}%</span>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+                      </motion.div>
+                    ))}
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
         ))}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };

@@ -1,0 +1,30 @@
+---
+globs: *.tsx,*.ts
+description: React component development patterns and TypeScript guidelines
+---
+
+# React Component Guidelines
+
+## Component Structure
+- Use functional components with TypeScript
+- Define proper prop interfaces using the types from [src/types/weather.ts](mdc:src/types/weather.ts)
+- Implement proper error boundaries and loading states
+- Use custom hooks from [src/hooks/](mdc:src/hooks/) when appropriate
+
+## Key Components
+- [src/components/WeatherCard.tsx](mdc:src/components/WeatherCard.tsx) - Main weather display
+- [src/components/Forecast.tsx](mdc:src/components/Forecast.tsx) - Weather forecast
+- [src/components/SearchBar.tsx](mdc:src/components/SearchBar.tsx) - Location search
+- [src/components/Favorites.tsx](mdc:src/components/Favorites.tsx) - Saved locations
+- [src/components/WeatherCharts.tsx](mdc:src/components/WeatherCharts.tsx) - Data visualization
+
+## Styling
+- Use Tailwind CSS classes for styling
+- Follow the design system established in [src/index.css](mdc:src/index.css)
+- Ensure responsive design for mobile and desktop
+- Use consistent spacing and color schemes
+
+## State Management
+- Use React hooks (useState, useEffect, useContext) for local state
+- Implement [src/hooks/useLocalStorage.ts](mdc:src/hooks/useLocalStorage.ts) for persistent data
+- Handle async operations with proper loading and error states

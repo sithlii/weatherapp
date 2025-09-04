@@ -1,0 +1,31 @@
+---
+alwaysApply: true
+description: Core project structure and development guidelines for the React Weather App
+---
+
+# Weather App Project Structure
+
+This is a React + TypeScript + Vite weather application with the following key structure:
+
+## Core Files
+- [src/main.tsx](mdc:src/main.tsx) - Application entry point
+- [src/App.tsx](mdc:src/App.tsx) - Main application component
+- [package.json](mdc:package.json) - Dependencies and scripts
+- [vite.config.ts](mdc:vite.config.ts) - Vite build configuration
+
+## Key Directories
+- `src/components/` - Reusable React components
+- `src/services/` - API services and external integrations
+- `src/hooks/` - Custom React hooks
+- `src/types/` - TypeScript type definitions
+- `scripts/` - Build and deployment scripts
+- `docs/` - Project documentation
+
+## Development Guidelines
+- Use TypeScript for all new files
+- Follow React functional component patterns with hooks
+- Use Tailwind CSS for styling
+- Implement proper error handling and loading states
+- Maintain responsive design principles
+- Maintain DRY coding principles
+- Use Framer Motion for animations

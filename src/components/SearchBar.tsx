@@ -171,7 +171,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ onSearch, loading }) => {
         className="absolute right-2 top-2 bottom-2 px-6 btn-primary disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
       >
         {loading ? (
-          <div className="loading-spinner h-5 w-5" />
+          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
         ) : (
           'Search'
         )}

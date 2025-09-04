@@ -1,6 +1,12 @@
 import React from 'react';
+import { motion } from 'framer-motion';
 import { WeatherData } from '../types/weather';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import { 
+  getTemperatureColor, 
+  getConditionGradient, 
+  formatTime 
+} from '../utils/weatherUtils';
 import { 
   Droplets, 
   Wind, 
@@ -37,44 +43,28 @@ export const WeatherCard: React.FC<WeatherCardProps> = ({ weather }) => {
       setFavorites([...favorites, favorite]);
     }
   };
-  const formatTime = (timestamp: string) => {
-    return new Date(timestamp).toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    });
-  };
 
-  const getTemperatureColor = (temp: number) => {
-    if (temp < 0) return 'text-blue-400';
-    if (temp < 10) return 'text-blue-500';
-    if (temp < 20) return 'text-green-500';
-    if (temp < 30) return 'text-yellow-500';
-    return 'text-red-500';
-  };
-
-  const getConditionGradient = (condition: string) => {
-    switch (condition) {
-      case 'clear':
-        return 'from-yellow-400 to-orange-500';
-      case 'clouds':
-        return 'from-gray-400 to-gray-600';
-      case 'rain':
-        return 'from-blue-400 to-blue-600';
-      case 'snow':
-        return 'from-blue-200 to-blue-400';
-      case 'thunderstorm':
-        return 'from-purple-500 to-indigo-600';
-      default:
-        return 'from-gray-400 to-gray-600';
-    }
-  };
 
   return (
-    <div className="weather-card animate-fade-in">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className="weather-card"
+    >
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center space-x-3">
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.3 }}
+        className="flex items-center justify-between mb-6"
+      >
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2, duration: 0.3 }}
+          className="flex items-center space-x-3"
+        >
           <MapPin className="w-5 h-5 text-gray-500" />
           <div>
             <h2 className="text-xl font-semibold text-gray-900">
@@ -82,9 +72,16 @@ export const WeatherCard: React.FC<WeatherCardProps> = ({ weather }) => {
             </h2>
             <p className="text-sm text-gray-500">{weather.country}</p>
           </div>
-        </div>
-        <div className="flex items-center space-x-4">
-          <button
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.3, duration: 0.3 }}
+          className="flex items-center space-x-4"
+        >
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
             onClick={toggleFavorite}
             className={`p-2 rounded-full transition-all duration-300 ${
               isFavorite() 
@@ -94,29 +91,43 @@ export const WeatherCard: React.FC<WeatherCardProps> = ({ weather }) => {
             title={isFavorite() ? 'Remove from favorites' : 'Add to favorites'}
           >
             <Heart className={`w-5 h-5 ${isFavorite() ? 'fill-current' : ''}`} />
-          </button>
+          </motion.button>
           <div className="text-right">
             <div className="flex items-center space-x-2 text-sm text-gray-500">
               <Clock className="w-4 h-4" />
               <span>{formatTime(weather.timestamp)}</span>
             </div>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* Main Weather Display */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4, duration: 0.3 }}
+        className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+      >
         {/* Temperature and Condition */}
         <div className="lg:col-span-2">
           <div className="flex items-center space-x-6">
-            <div className="relative">
+            <motion.div
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ delay: 0.5, duration: 0.5, ease: 'easeOut' }}
+              className="relative"
+            >
               <img
                 src={weather.icon}
                 alt={weather.description}
                 className="w-24 h-24 weather-icon"
               />
-            </div>
-            <div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.6, duration: 0.3 }}
+            >
               <div className={`text-6xl font-bold ${getTemperatureColor(weather.temperature)}`}>
                 {weather.temperature}°
               </div>
@@ -127,44 +138,50 @@ export const WeatherCard: React.FC<WeatherCardProps> = ({ weather }) => {
                 <ThermometerSun className="w-4 h-4" />
                 <span>Feels like {weather.feelsLike}°</span>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
 
         {/* Weather Details */}
-        <div className="space-y-4">
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.7, duration: 0.3 }}
+          className="space-y-4"
+        >
           <div className="grid grid-cols-2 gap-4">
-            <div className="glass-effect rounded-xl p-4 text-center">
-              <Droplets className="w-6 h-6 text-blue-500 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-gray-900">{weather.humidity}%</div>
-              <div className="text-sm text-gray-500">Humidity</div>
-            </div>
-            
-            <div className="glass-effect rounded-xl p-4 text-center">
-              <Wind className="w-6 h-6 text-green-500 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-gray-900">{weather.windSpeed}</div>
-              <div className="text-sm text-gray-500">km/h</div>
-            </div>
-            
-            <div className="glass-effect rounded-xl p-4 text-center">
-              <Gauge className="w-6 h-6 text-purple-500 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-gray-900">{weather.pressure}</div>
-              <div className="text-sm text-gray-500">hPa</div>
-            </div>
-            
-            <div className="glass-effect rounded-xl p-4 text-center">
-              <Eye className="w-6 h-6 text-indigo-500 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-gray-900">{weather.visibility}</div>
-              <div className="text-sm text-gray-500">km</div>
-            </div>
+            {[
+              { icon: Droplets, value: weather.humidity, unit: '%', label: 'Humidity', color: 'text-blue-500', delay: 0.8 },
+              { icon: Wind, value: weather.windSpeed, unit: 'km/h', label: 'Wind Speed', color: 'text-green-500', delay: 0.9 },
+              { icon: Gauge, value: weather.pressure, unit: 'hPa', label: 'Pressure', color: 'text-purple-500', delay: 1.0 },
+              { icon: Eye, value: weather.visibility, unit: 'km', label: 'Visibility', color: 'text-indigo-500', delay: 1.1 }
+            ].map(({ icon: Icon, value, unit, label, color, delay }) => (
+              <motion.div
+                key={label}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay, duration: 0.3, ease: 'easeOut' }}
+                whileHover={{ scale: 1.05 }}
+                className="glass-effect rounded-xl p-4 text-center"
+              >
+                <Icon className={`w-6 h-6 ${color} mx-auto mb-2`} />
+                <div className="text-2xl font-bold text-gray-900">{value}{unit}</div>
+                <div className="text-sm text-gray-500">{label}</div>
+              </motion.div>
+            ))}
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* Condition Bar */}
-      <div className="mt-6">
+      <motion.div
+        initial={{ width: 0 }}
+        animate={{ width: '100%' }}
+        transition={{ delay: 1.2, duration: 0.8, ease: 'easeOut' }}
+        className="mt-6"
+      >
         <div className={`h-2 rounded-full bg-gradient-to-r ${getConditionGradient(weather.condition)} opacity-20`}></div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
