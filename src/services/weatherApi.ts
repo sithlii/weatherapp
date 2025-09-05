@@ -60,17 +60,29 @@ export const weatherService = {
           appid: API_KEY,
           type: 'like',
           sort: 'population',
-          cnt: 5
+          cnt: 10 // Get more results to filter duplicates
         }
       });
 
-      return response.data.list.map((city: any) => ({
+      const cities = response.data.list.map((city: any) => ({
         name: city.name,
         country: city.sys.country,
         state: city.state,
         lat: city.coord.lat,
         lon: city.coord.lon
       }));
+
+      // Remove duplicates based on name and country, keeping the most populated one
+      const uniqueCities = new Map<string, SearchResult>();
+      
+      cities.forEach((city: SearchResult) => {
+        const key = `${city.name},${city.country}`;
+        if (!uniqueCities.has(key)) {
+          uniqueCities.set(key, city);
+        }
+      });
+
+      return Array.from(uniqueCities.values()).slice(0, 5);
     } catch (error) {
       console.error('Error searching cities:', error);
       return [];
@@ -78,14 +90,14 @@ export const weatherService = {
   },
 
   // Get current weather by coordinates
-  async getCurrentWeatherByCoords(lat: number, lon: number): Promise<WeatherData | WeatherError> {
+  async getCurrentWeatherByCoords(lat: number, lon: number, unit: 'metric' | 'imperial' = 'metric'): Promise<WeatherData | WeatherError> {
     try {
       const response = await weatherApi.get('/weather', {
         params: {
           lat,
           lon,
           appid: API_KEY,
-          units: 'metric'
+          units: unit
         }
       });
 
@@ -98,9 +110,9 @@ export const weatherService = {
         condition: getWeatherCondition(data.weather[0].id),
         description: data.weather[0].description,
         humidity: data.main.humidity,
-        windSpeed: Math.round(data.wind.speed * 3.6), // Convert m/s to km/h
+        windSpeed: unit === 'metric' ? Math.round(data.wind.speed * 3.6) : Math.round(data.wind.speed), // Convert m/s to km/h for metric, keep mph for imperial
         pressure: data.main.pressure,
-        visibility: Math.round(data.visibility / 1000), // Convert m to km
+        visibility: unit === 'metric' ? Math.round(data.visibility / 1000) : Math.round(data.visibility * 0.000621371), // Convert m to km for metric, m to miles for imperial
         timestamp: new Date().toISOString(),
         icon: getWeatherIcon(data.weather[0].icon),
         lat: data.coord.lat,
@@ -116,14 +128,14 @@ export const weatherService = {
   },
 
   // Get current weather by city name
-  async getCurrentWeatherByCity(city: string, country?: string): Promise<WeatherData | WeatherError> {
+  async getCurrentWeatherByCity(city: string, country?: string, unit: 'metric' | 'imperial' = 'metric'): Promise<WeatherData | WeatherError> {
     try {
       const query = country ? `${city},${country}` : city;
       const response = await weatherApi.get('/weather', {
         params: {
           q: query,
           appid: API_KEY,
-          units: 'metric'
+          units: unit
         }
       });
 
@@ -136,9 +148,9 @@ export const weatherService = {
         condition: getWeatherCondition(data.weather[0].id),
         description: data.weather[0].description,
         humidity: data.main.humidity,
-        windSpeed: Math.round(data.wind.speed * 3.6),
+        windSpeed: unit === 'metric' ? Math.round(data.wind.speed * 3.6) : Math.round(data.wind.speed),
         pressure: data.main.pressure,
-        visibility: Math.round(data.visibility / 1000),
+        visibility: unit === 'metric' ? Math.round(data.visibility / 1000) : Math.round(data.visibility * 0.000621371),
         timestamp: new Date().toISOString(),
         icon: getWeatherIcon(data.weather[0].icon),
         lat: data.coord.lat,
@@ -154,14 +166,14 @@ export const weatherService = {
   },
 
   // Get 5-day forecast
-  async getForecast(lat: number, lon: number): Promise<WeatherForecast | WeatherError> {
+  async getForecast(lat: number, lon: number, unit: 'metric' | 'imperial' = 'metric'): Promise<WeatherForecast | WeatherError> {
     try {
       const [currentResponse, forecastResponse] = await Promise.all([
         weatherApi.get('/weather', {
-          params: { lat, lon, appid: API_KEY, units: 'metric' }
+          params: { lat, lon, appid: API_KEY, units: unit }
         }),
         weatherApi.get('/forecast', {
-          params: { lat, lon, appid: API_KEY, units: 'metric' }
+          params: { lat, lon, appid: API_KEY, units: unit }
         })
       ]);
 
@@ -177,9 +189,9 @@ export const weatherService = {
         condition: getWeatherCondition(currentData.weather[0].id),
         description: currentData.weather[0].description,
         humidity: currentData.main.humidity,
-        windSpeed: Math.round(currentData.wind.speed * 3.6),
+        windSpeed: unit === 'metric' ? Math.round(currentData.wind.speed * 3.6) : Math.round(currentData.wind.speed),
         pressure: currentData.main.pressure,
-        visibility: Math.round(currentData.visibility / 1000),
+        visibility: unit === 'metric' ? Math.round(currentData.visibility / 1000) : Math.round(currentData.visibility * 0.000621371),
         timestamp: new Date().toISOString(),
         icon: getWeatherIcon(currentData.weather[0].icon),
         lat: currentData.coord.lat,
@@ -220,7 +232,7 @@ export const weatherService = {
           condition: getWeatherCondition(item.weather[0].id),
           description: item.weather[0].description,
           humidity: item.main.humidity,
-          windSpeed: Math.round(item.wind.speed * 3.6),
+          windSpeed: unit === 'metric' ? Math.round(item.wind.speed * 3.6) : Math.round(item.wind.speed),
           icon: getWeatherIcon(item.weather[0].icon)
         });
       });
@@ -234,7 +246,7 @@ export const weatherService = {
         condition: getWeatherCondition(day.conditions[0].id),
         description: day.conditions[0].description,
         humidity: Math.round(day.humidities.reduce((a: number, b: number) => a + b, 0) / day.humidities.length),
-        windSpeed: Math.round(day.windSpeeds.reduce((a: number, b: number) => a + b, 0) / day.windSpeeds.length * 3.6),
+        windSpeed: unit === 'metric' ? Math.round(day.windSpeeds.reduce((a: number, b: number) => a + b, 0) / day.windSpeeds.length * 3.6) : Math.round(day.windSpeeds.reduce((a: number, b: number) => a + b, 0) / day.windSpeeds.length),
         icon: getWeatherIcon(day.conditions[0].icon),
         hourly: day.hourly
       }));

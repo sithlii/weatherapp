@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ForecastDay } from '../types/weather';
+import { useTemperatureUnit } from '../contexts/TemperatureUnitContext';
 import { 
   getTemperatureColor, 
   getConditionGradient, 
@@ -21,6 +22,7 @@ interface ForecastProps {
 
 export const Forecast: React.FC<ForecastProps> = ({ forecast }) => {
   const [expandedDay, setExpandedDay] = useState<number | null>(null);
+  const { getUnitSymbol } = useTemperatureUnit();
 
   const toggleExpanded = (index: number) => {
     setExpandedDay(expandedDay === index ? null : index);
@@ -115,13 +117,13 @@ export const Forecast: React.FC<ForecastProps> = ({ forecast }) => {
                   <div className="flex items-center space-x-2">
                     <ThermometerSun className="w-4 h-4 text-red-500" />
                     <span className={`text-lg font-bold ${getTemperatureColor(day.maxTemp)}`}>
-                      {day.maxTemp}°
+                      {day.maxTemp}{getUnitSymbol()}
                     </span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Thermometer className="w-4 h-4 text-blue-500" />
                     <span className={`text-lg font-bold ${getTemperatureColor(day.minTemp)}`}>
-                      {day.minTemp}°
+                      {day.minTemp}{getUnitSymbol()}
                     </span>
                   </div>
                 </div>
@@ -184,7 +186,7 @@ export const Forecast: React.FC<ForecastProps> = ({ forecast }) => {
                         className="w-8 h-8 mx-auto mb-2 weather-icon"
                       />
                       <div className={`text-lg font-bold ${getTemperatureColor(hour.temperature)}`}>
-                        {hour.temperature}°
+                        {hour.temperature}{getUnitSymbol()}
                       </div>
                       <div className="text-xs text-gray-500 capitalize truncate">
                         {hour.description}

@@ -6,20 +6,30 @@ import { WeatherCharts } from './components/WeatherCharts';
 import { Favorites } from './components/Favorites';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { ErrorMessage } from './components/ErrorMessage';
+import { TemperatureUnitToggle } from './components/TemperatureUnitToggle';
+import { TemperatureUnitProvider, useTemperatureUnit } from './contexts/TemperatureUnitContext';
 import { weatherService } from './services/weatherApi';
 import { WeatherForecast, WeatherError } from './types/weather';
 import { MapPin, Cloud, Sun, CloudRain, CloudSnow, Zap } from 'lucide-react';
 
-function App() {
+function AppContent() {
   const [weatherData, setWeatherData] = useState<WeatherForecast | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentLocation, setCurrentLocation] = useState<string>('');
+  const { unit } = useTemperatureUnit();
 
   // Load weather for user's current location on app start
   useEffect(() => {
     loadCurrentLocationWeather();
   }, []);
+
+  // Reload weather data when temperature unit changes
+  useEffect(() => {
+    if (weatherData) {
+      loadCurrentLocationWeather();
+    }
+  }, [unit]);
 
   const loadCurrentLocationWeather = async () => {
     setLoading(true);
@@ -28,7 +38,7 @@ function App() {
     try {
       const coords = await weatherService.getCurrentLocation();
       if (coords) {
-        const result = await weatherService.getForecast(coords.lat, coords.lon);
+        const result = await weatherService.getForecast(coords.lat, coords.lon, unit === 'celsius' ? 'metric' : 'imperial');
         if ('message' in result) {
           setError(result.message);
         } else {
@@ -60,13 +70,13 @@ function App() {
       let result: WeatherForecast | WeatherError;
       
       if (country) {
-        const currentWeather = await weatherService.getCurrentWeatherByCity(city, country);
+        const currentWeather = await weatherService.getCurrentWeatherByCity(city, country, unit === 'celsius' ? 'metric' : 'imperial');
         if ('message' in currentWeather) {
           setError(currentWeather.message);
           setLoading(false);
           return;
         }
-        result = await weatherService.getForecast(currentWeather.lat || 0, currentWeather.lon || 0);
+        result = await weatherService.getForecast(currentWeather.lat || 0, currentWeather.lon || 0, unit === 'celsius' ? 'metric' : 'imperial');
       } else {
         // Try to get coordinates first
         const cities = await weatherService.searchCities(city);
@@ -77,7 +87,7 @@ function App() {
         }
         
         const selectedCity = cities[0];
-        result = await weatherService.getForecast(selectedCity.lat, selectedCity.lon);
+        result = await weatherService.getForecast(selectedCity.lat, selectedCity.lon, unit === 'celsius' ? 'metric' : 'imperial');
       }
       
       if ('message' in result) {
@@ -98,7 +108,7 @@ function App() {
     setError(null);
     
     try {
-      const result = await weatherService.getForecast(lat, lon);
+      const result = await weatherService.getForecast(lat, lon, unit === 'celsius' ? 'metric' : 'imperial');
       if ('message' in result) {
         setError(result.message);
       } else {
@@ -139,9 +149,12 @@ function App() {
               {getWeatherIcon(weatherData?.current.condition || 'clear')}
               <h1 className="text-2xl font-bold gradient-text">Weather App</h1>
             </div>
-            <div className="flex items-center space-x-2 text-sm text-gray-600">
-              <MapPin className="w-4 h-4" />
-              <span>{currentLocation || 'Loading location...'}</span>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2 text-sm text-gray-600">
+                <MapPin className="w-4 h-4" />
+                <span>{currentLocation || 'Loading location...'}</span>
+              </div>
+              <TemperatureUnitToggle />
             </div>
           </div>
         </div>
@@ -220,6 +233,14 @@ function App() {
         </div>
       </footer>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <TemperatureUnitProvider>
+      <AppContent />
+    </TemperatureUnitProvider>
   );
 }
 

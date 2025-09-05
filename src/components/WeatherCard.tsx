@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { WeatherData } from '../types/weather';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useTemperatureUnit } from '../contexts/TemperatureUnitContext';
 import { 
   getTemperatureColor, 
   getConditionGradient, 
@@ -24,6 +25,7 @@ interface WeatherCardProps {
 
 export const WeatherCard: React.FC<WeatherCardProps> = ({ weather }) => {
   const [favorites, setFavorites] = useLocalStorage<Array<{name: string, country: string, lat: number, lon: number}>>('weather-favorites', []);
+  const { getUnitSymbol } = useTemperatureUnit();
 
   const isFavorite = () => {
     return favorites.some(fav => fav.name === weather.location && fav.country === weather.country);
@@ -129,14 +131,14 @@ export const WeatherCard: React.FC<WeatherCardProps> = ({ weather }) => {
               transition={{ delay: 0.6, duration: 0.3 }}
             >
               <div className={`text-6xl font-bold ${getTemperatureColor(weather.temperature)}`}>
-                {weather.temperature}°
+                {weather.temperature}{getUnitSymbol()}
               </div>
               <div className="text-xl text-gray-600 capitalize">
                 {weather.description}
               </div>
               <div className="flex items-center space-x-2 text-gray-500 mt-2">
                 <ThermometerSun className="w-4 h-4" />
-                <span>Feels like {weather.feelsLike}°</span>
+                <span>Feels like {weather.feelsLike}{getUnitSymbol()}</span>
               </div>
             </motion.div>
           </div>
