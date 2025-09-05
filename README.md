@@ -40,8 +40,6 @@ npm run dev
 ├── vite.config.ts       # Vite configuration
 ├── tailwind.config.js   # Tailwind CSS config
 ├── postcss.config.js    # PostCSS config
-├── docs/                # Documentation
-│   └── README.md        # Detailed documentation
 ├── scripts/             # Build and setup scripts
 │   └── install.sh       # Installation script
 ├── src/                 # Source code
@@ -61,10 +59,6 @@ npm run dev
 - `npm run preview` - Preview production build
 - `npm run lint` - Run ESLint
 - `npm run install:setup` - Run setup script
-
-## 📖 Documentation
-
-For detailed documentation, see [docs/README.md](docs/README.md)
 
 ## 🔧 Configuration
 
