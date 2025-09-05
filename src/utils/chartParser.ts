@@ -21,11 +21,11 @@ export interface ParsedChartRequest {
 
 export class ChartParser {
   private static chartTypeKeywords = {
-    bar: ['bar', 'bars', 'column', 'columns', 'vertical', 'histogram'],
-    line: ['line', 'lines', 'trend', 'trends', 'charting', 'chart', 'graph'],
-    area: ['area', 'filled', 'shaded', 'stacked'],
     pie: ['pie', 'circle', 'donut', 'percentage', 'proportion', 'distribution'],
-    scatter: ['scatter', 'points', 'dots', 'correlation', 'plot']
+    bar: ['bar', 'bars', 'column', 'columns', 'vertical', 'histogram'],
+    area: ['area', 'filled', 'shaded', 'stacked'],
+    scatter: ['scatter', 'points', 'dots', 'correlation', 'plot'],
+    line: ['line', 'lines', 'trend', 'trends', 'charting', 'chart', 'graph']
   };
 
   private static dataTypeKeywords = {
@@ -73,6 +73,24 @@ export class ChartParser {
   }
 
   private static detectChartType(prompt: string): 'bar' | 'line' | 'area' | 'pie' | 'scatter' {
+    // Check for specific chart type mentions first
+    if (prompt.includes('pie chart') || prompt.includes('piechart')) {
+      return 'pie';
+    }
+    if (prompt.includes('bar chart') || prompt.includes('barchart')) {
+      return 'bar';
+    }
+    if (prompt.includes('line chart') || prompt.includes('linechart')) {
+      return 'line';
+    }
+    if (prompt.includes('area chart') || prompt.includes('areachart')) {
+      return 'area';
+    }
+    if (prompt.includes('scatter plot') || prompt.includes('scatterplot')) {
+      return 'scatter';
+    }
+    
+    // Then check for individual keywords
     for (const [type, keywords] of Object.entries(this.chartTypeKeywords)) {
       if (keywords.some(keyword => prompt.includes(keyword))) {
         return type as any;

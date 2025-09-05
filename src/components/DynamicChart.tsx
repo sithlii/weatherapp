@@ -35,33 +35,28 @@ export const DynamicChart: React.FC<DynamicChartProps> = ({
   isLoading = false,
   onDelete
 }) => {
-  // Prepare data based on the request
-  const chartData = React.useMemo(() => {
+  // Error boundary for individual charts
+  try {
+    // Prepare data based on the request
+    const chartData = React.useMemo(() => {
     if (request.timeRange === 'today' && forecast[0]?.hourly) {
       // For hourly data, use the first day's hourly forecast
       return forecast[0].hourly.map(hour => ({
-        time: hour.time,
+        ...hour,
         date: hour.time,
         maxTemp: hour.temperature,
         minTemp: hour.temperature,
         avgTemp: hour.temperature,
-        humidity: hour.humidity,
-        windSpeed: hour.windSpeed,
-        pressure: 1013, // Default pressure if not available
-        ...hour
+        pressure: 1013 // Default pressure if not available
       }));
     } else {
       // For weekly data, use the forecast days
       return forecast.map(day => ({
+        ...day,
         day: day.dayName,
         date: new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        maxTemp: day.maxTemp,
-        minTemp: day.minTemp,
         avgTemp: Math.round((day.maxTemp + day.minTemp) / 2),
-        humidity: day.humidity,
-        windSpeed: day.windSpeed,
-        pressure: 1013, // Default pressure if not available
-        ...day
+        pressure: 1013 // Default pressure if not available
       }));
     }
   }, [request, forecast]);
@@ -165,15 +160,77 @@ export const DynamicChart: React.FC<DynamicChartProps> = ({
         );
 
       case 'pie':
-        const pieData = chartData.map(item => ({
-          name: item[request.config.xAxisKey as keyof typeof item],
-          value: item[request.config.dataKey as keyof typeof item]
-        }));
+        // Create meaningful pie chart data based on data type
+        let pieData;
+        if (request.dataType === 'humidity') {
+          // Group humidity into ranges
+          const ranges = [
+            { name: 'Low (0-30%)', min: 0, max: 30 },
+            { name: 'Medium (30-60%)', min: 30, max: 60 },
+            { name: 'High (60-80%)', min: 60, max: 80 },
+            { name: 'Very High (80-100%)', min: 80, max: 100 }
+          ];
+          
+          pieData = ranges.map(range => {
+            const count = chartData.filter(item => {
+              const value = item[request.config.dataKey as keyof typeof item] as number;
+              return value >= range.min && value < range.max;
+            }).length;
+            return { name: range.name, value: count };
+          }).filter(item => item.value > 0);
+        } else if (request.dataType === 'temperature') {
+          // Group temperature into ranges
+          const ranges = [
+            { name: 'Cold (< 10°C)', min: -50, max: 10 },
+            { name: 'Cool (10-20°C)', min: 10, max: 20 },
+            { name: 'Warm (20-30°C)', min: 20, max: 30 },
+            { name: 'Hot (> 30°C)', min: 30, max: 50 }
+          ];
+          
+          pieData = ranges.map(range => {
+            const count = chartData.filter(item => {
+              const value = item[request.config.dataKey as keyof typeof item] as number;
+              return value >= range.min && value < range.max;
+            }).length;
+            return { name: range.name, value: count };
+          }).filter(item => item.value > 0);
+        } else if (request.dataType === 'wind') {
+          // Group wind speed into ranges
+          const ranges = [
+            { name: 'Calm (0-10 km/h)', min: 0, max: 10 },
+            { name: 'Light (10-20 km/h)', min: 10, max: 20 },
+            { name: 'Moderate (20-30 km/h)', min: 20, max: 30 },
+            { name: 'Strong (> 30 km/h)', min: 30, max: 100 }
+          ];
+          
+          pieData = ranges.map(range => {
+            const count = chartData.filter(item => {
+              const value = item[request.config.dataKey as keyof typeof item] as number;
+              return value >= range.min && value < range.max;
+            }).length;
+            return { name: range.name, value: count };
+          }).filter(item => item.value > 0);
+        } else {
+          // Default: use day names for forecast data
+          pieData = chartData.map(item => ({
+            name: item.day || item.date,
+            value: item[request.config.dataKey as keyof typeof item] as number
+          }));
+        }
+
+        // Handle empty pie data
+        if (!pieData || pieData.length === 0) {
+          return (
+            <div className="flex items-center justify-center h-64 text-gray-500">
+              <p>No data available for pie chart</p>
+            </div>
+          );
+        }
 
         const COLORS = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
 
         return (
-          <PieChart {...commonProps}>
+          <PieChart width={400} height={300}>
             <Pie
               data={pieData}
               cx="50%"
@@ -264,4 +321,15 @@ export const DynamicChart: React.FC<DynamicChartProps> = ({
       </div>
     </div>
   );
+  } catch (error) {
+    console.error('Error rendering chart:', error);
+    return (
+      <div className="glass-effect rounded-xl p-6 relative group mt-4">
+        <div className="text-center text-red-500">
+          <p className="font-semibold">Chart Error</p>
+          <p className="text-sm">Failed to render chart. Please try again.</p>
+        </div>
+      </div>
+    );
+  }
 };
